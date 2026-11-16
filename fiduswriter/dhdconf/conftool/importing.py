@@ -64,8 +64,7 @@ def _accept_invites(user, verified_emails: List[str]):
     for cui in UserInvite.objects.filter(email__in=verified_emails):
         cui.to = user
         cui.save()
-        # apply() uses generic relations which need the un-extended model
-        cui.userinvite_ptr.apply()
+        cui.apply()
 
 
 def import_paper(data: ExportPaperResponse):
@@ -131,6 +130,6 @@ def _synchronize_access_rights(document: ConftoolDocument, emails: list[str]):
     # only leave those invites and access rights we just set up
     others = UserInvite.objects.filter(email__in=emails).exclude(pk__in=invites)
     for invite in others:
-        invite.userinvite_ptr.document_rights.clear()
+        invite.document_rights.clear()
         invite.delete()
     AccessRight.objects.filter(document=document).exclude(pk__in=rights).delete()
